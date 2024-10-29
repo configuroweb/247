@@ -142,51 +142,7 @@ tr:nth-child(even) {
     background-color: #fff3e0 !important;
 }
 
-/* Tabla de resumen */
-.summary-section {
-    margin-bottom: 30px;
-}
-
-.summary-section h3 {
-    color: var(--text-color);
-    margin-bottom: 15px;
-}
-
-.summary-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--white);
-    margin-bottom: 20px;
-}
-
-.summary-table th,
-.summary-table td {
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.summary-table th {
-    background-color: var(--primary-color);
-    color: var(--white);
-    font-weight: bold;
-}
-
-.summary-table td:first-child {
-    text-align: left;
-    font-weight: bold;
-}
-
-.summary-table tr:hover {
-    background-color: #f5f5f5;
-}
-
-.summary-table .total-row {
-    background-color: #e0e0e0;
-    font-weight: bold;
-}
-
-/* Secciones de totales */
+/* Sección de totales */
 .totals {
     margin-top: 20px;
     padding: 15px;

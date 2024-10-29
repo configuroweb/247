@@ -127,48 +127,75 @@ function calculateHours(date, shift, cycleDay, isFirstDay, weekTracker) {
     if (shift === 'noche') {
         if (isFirstDay || cycleDay === 1) {
             totalNewHours = 2;
-            if (currentHours + totalNewHours >= 48) {
-                assignRegularHours(0, 1);
-                assignRegularHours(0, 1, true);
+            if (currentHours >= 46) {
+                // Si ya estamos en o después de la hora 46, todas son extras
+                assignRegularHours(0, 2, true);
+            } else if (currentHours + totalNewHours > 46) {
+                // Si cruzamos el límite durante estas horas
+                const regularHours = 46 - currentHours;
+                assignRegularHours(0, regularHours);
+                assignRegularHours(0, totalNewHours - regularHours, true);
             } else {
                 assignRegularHours(0, 2);
             }
         } else if (cycleDay >= 2 && cycleDay <= 6) {
             totalNewHours = 8;
-            if (currentHours + totalNewHours > 48) {
-                assignRegularHours(0, 7);
-                assignRegularHours(0, 1, true);
+            if (currentHours >= 46) {
+                // Si ya estamos en o después de la hora 46, todas son extras
+                assignRegularHours(0, 8, true);
+            } else if (currentHours + totalNewHours > 46) {
+                // Si cruzamos el límite durante estas horas
+                const regularHours = 46 - currentHours;
+                assignRegularHours(0, regularHours);
+                assignRegularHours(0, totalNewHours - regularHours, true);
             } else {
                 assignRegularHours(0, 8);
             }
         }
     } else if (shift === 'tarde') {
         totalNewHours = 8;  // 7 regulares + 1 nocturna
-        if (currentHours + totalNewHours >= 48) {
-            assignRegularHours(7, 0);
-            assignRegularHours(0, 1, true); // La hora extra siempre es nocturna
+        if (currentHours >= 46) {
+            // Si ya estamos en o después de la hora 46, todas son extras
+            assignRegularHours(7, 1, true);
+        } else if (currentHours + totalNewHours > 46) {
+            // Si cruzamos el límite durante estas horas
+            const regularHours = 46 - currentHours;
+            const extraHours = totalNewHours - regularHours;
+            
+            if (regularHours >= 7) {
+                assignRegularHours(7, 0);
+                assignRegularHours(0, 1, true);
+            } else {
+                assignRegularHours(regularHours, 0);
+                assignRegularHours(7 - regularHours, 1, true);
+            }
         } else {
             assignRegularHours(7, 1);
         }
     } else { // mañana
         totalNewHours = 8;
-        if (currentHours + totalNewHours >= 48) {  // Cambiado de > a >=
-            const hoursUntil48 = 48 - currentHours;
-            const regularHours = hoursUntil48;
-            const extraHours = totalNewHours - hoursUntil48;
+        if (currentHours >= 46) {
+            // Si ya estamos en o después de la hora 46, todas son extras
+            if (isHol) {
+                hours.extraHoliday = 8;
+            } else if (isSun) {
+                hours.extraSunday = 8;
+            } else {
+                hours.extraRegular = 8;
+            }
+        } else if (currentHours + totalNewHours > 46) {
+            const regularHours = 46 - currentHours;
+            const extraHours = totalNewHours - regularHours;
 
             if (isHol) {
-                // Si es festivo, dividir entre horas festivas normales y extra festiva
-                hours.holiday = 7;
-                hours.extraHoliday = 1;
+                hours.holiday = regularHours;
+                hours.extraHoliday = extraHours;
             } else if (isSun) {
-                // Si es domingo, dividir entre horas dominicales normales y extra dominical
-                hours.sunday = 7;
-                hours.extraSunday = 1;
+                hours.sunday = regularHours;
+                hours.extraSunday = extraHours;
             } else {
-                // Día normal, dividir entre horas regulares normales y extra regular
-                hours.regular = 7;
-                hours.extraRegular = 1;
+                hours.regular = regularHours;
+                hours.extraRegular = extraHours;
             }
         } else {
             if (isHol) {
@@ -205,22 +232,32 @@ function calculateExtraNightHours(date, weekTracker) {
     const nextIsSun = isSunday(nextDay);
     
     const currentHours = weekTracker.getCurrentHours();
-    const willReach48 = currentHours < 48 && (currentHours + 6) >= 48;
-
-    if (willReach48) {
-        // 5 horas normales + 1 extra
+    const willReach46 = currentHours < 46 && (currentHours + 6) >= 46;
+    
+    if (currentHours >= 46) {
+        // Si ya estamos en o después de la hora 46, todas son extras
         if (nextIsHol) {
-            extraHours.nightHoliday = 5;
-            extraHours.extraNightHoliday = 1;
+            extraHours.extraNightHoliday = 6;
         } else if (nextIsSun) {
-            extraHours.nightSunday = 5;
-            extraHours.extraNightSunday = 1;
+            extraHours.extraNightSunday = 6;
         } else {
-            extraHours.night = 5;
-            extraHours.extraNight = 1;
+            extraHours.extraNight = 6;
+        }
+    } else if (willReach46) {
+        const regularHours = 46 - currentHours;
+        const extraHoursCount = 6 - regularHours;
+        
+        if (nextIsHol) {
+            extraHours.nightHoliday = regularHours;
+            extraHours.extraNightHoliday = extraHoursCount;
+        } else if (nextIsSun) {
+            extraHours.nightSunday = regularHours;
+            extraHours.extraNightSunday = extraHoursCount;
+        } else {
+            extraHours.night = regularHours;
+            extraHours.extraNight = extraHoursCount;
         }
     } else {
-        // 6 horas normales
         if (nextIsHol) {
             extraHours.nightHoliday = 6;
         } else if (nextIsSun) {
@@ -249,7 +286,8 @@ function generateSchedule(event) {
     let currentDay = dayOfCycle - 1;
     
     const headerRow = '<tr>' +
-        '<th>Fecha</th><th>Día</th><th>Turno</th><th>Día Ciclo</th>' +
+        '<th>Fecha</th><th>Día</th><th>Turno</th>' +
+        '<th>Día Ciclo</th>' +
         '<th>Regular</th><th>Extra Regular</th>' +
         '<th>Nocturna</th><th>Extra Nocturna</th>' +
         '<th>Dominical</th><th>Extra Dominical</th>' +
@@ -260,7 +298,7 @@ function generateSchedule(event) {
     let tableHTML = '<table>' + headerRow;
 
     const daysInMonth = new Date(year, month, 0).getDate();
-    const weekTracker = new WeeklyHoursTracker();
+    let weekTracker = new WeeklyHoursTracker();
     let monthTotals = {
         regular: 0, night: 0,
         sunday: 0, holiday: 0,
@@ -276,6 +314,11 @@ function generateSchedule(event) {
         daysToSkip = 2; // Necesita saltar 2 días para llegar al día 1
     } else if (dayOfCycle === 8) { // DD2
         daysToSkip = 1; // Necesita saltar 1 día para llegar al día 1
+    }
+
+    // Ajustamos el currentDay si empezamos en descanso
+    if (daysToSkip > 0) {
+        currentDay = 6; // Empezaremos en el último día del ciclo anterior
     }
 
     for (let i = 0; i < daysInMonth; i++) {
@@ -299,6 +342,7 @@ function generateSchedule(event) {
             continue;
         }
 
+        // Reset del contador de horas semanales al inicio de cada ciclo
         if (cycleDay === 1) {
             weekTracker.reset(currentDate);
         }
@@ -369,84 +413,38 @@ function generateSchedule(event) {
         <td>${monthTotals.nightHoliday}</td>
         <td>${monthTotals.extraNightHoliday}</td>
     </tr>`;
+
     tableHTML += '</table>';
-
-    // Generar solo la tabla de resumen
-    const summaryTableHTML = `
-        <div class="summary-section">
-            <h3>Resumen de Horas del Mes</h3>
-            <table class="summary-table">
-                <thead>
-                    <tr>
-                        <th>Tipo de Hora</th>
-                        <th>Horas Normales</th>
-                        <th>Horas Extra</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Regulares</td>
-                        <td>${monthTotals.regular}</td>
-                        <td>${monthTotals.extraRegular}</td>
-                        <td>${monthTotals.regular + monthTotals.extraRegular}</td>
-                    </tr>
-                    <tr>
-                        <td>Nocturnas</td>
-                        <td>${monthTotals.night}</td>
-                        <td>${monthTotals.extraNight}</td>
-                        <td>${monthTotals.night + monthTotals.extraNight}</td>
-                    </tr>
-                    <tr>
-                        <td>Dominicales</td>
-                        <td>${monthTotals.sunday}</td>
-                        <td>${monthTotals.extraSunday}</td>
-                        <td>${monthTotals.sunday + monthTotals.extraSunday}</td>
-                    </tr>
-                    <tr>
-                        <td>Festivas</td>
-                        <td>${monthTotals.holiday}</td>
-                        <td>${monthTotals.extraHoliday}</td>
-                        <td>${monthTotals.holiday + monthTotals.extraHoliday}</td>
-                    </tr>
-                    <tr>
-                        <td>Nocturnas Dominicales</td>
-                        <td>${monthTotals.nightSunday}</td>
-                        <td>${monthTotals.extraNightSunday}</td>
-                        <td>${monthTotals.nightSunday + monthTotals.extraNightSunday}</td>
-                    </tr>
-                    <tr>
-                        <td>Nocturnas Festivas</td>
-                        <td>${monthTotals.nightHoliday}</td>
-                        <td>${monthTotals.extraNightHoliday}</td>
-                        <td>${monthTotals.nightHoliday + monthTotals.extraNightHoliday}</td>
-                    </tr>
-                    <tr class="total-row">
-                        <td>TOTAL</td>
-                        <td>${Object.values({
-                            regular: monthTotals.regular,
-                            night: monthTotals.night,
-                            sunday: monthTotals.sunday,
-                            holiday: monthTotals.holiday,
-                            nightSunday: monthTotals.nightSunday,
-                            nightHoliday: monthTotals.nightHoliday
-                        }).reduce((a, b) => a + b, 0)}</td>
-                        <td>${Object.values({
-                            extraRegular: monthTotals.extraRegular,
-                            extraNight: monthTotals.extraNight,
-                            extraSunday: monthTotals.extraSunday,
-                            extraHoliday: monthTotals.extraHoliday,
-                            extraNightSunday: monthTotals.extraNightSunday,
-                            extraNightHoliday: monthTotals.extraNightHoliday
-                        }).reduce((a, b) => a + b, 0)}</td>
-                        <td>${Object.values(monthTotals).reduce((a, b) => a + b, 0)}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>`;
-
     document.getElementById('schedule').innerHTML = tableHTML;
-    document.getElementById('totals').innerHTML = summaryTableHTML;
+
+    const totalsHTML = `
+        <h3>Totales del Mes</h3>
+        <p>
+            Horas Regulares: ${monthTotals.regular} (Extras: ${monthTotals.extraRegular})<br>
+            Horas Nocturnas: ${monthTotals.night} (Extras: ${monthTotals.extraNight})<br>
+            Horas Dominicales: ${monthTotals.sunday} (Extras: ${monthTotals.extraSunday})<br>
+            Horas Festivas: ${monthTotals.holiday} (Extras: ${monthTotals.extraHoliday})<br>
+            Horas Nocturnas Dominicales: ${monthTotals.nightSunday} (Extras: ${monthTotals.extraNightSunday})<br>
+            Horas Nocturnas Festivas: ${monthTotals.nightHoliday} (Extras: ${monthTotals.extraNightHoliday})<br>
+            Total Horas Normal: ${Object.values({
+                regular: monthTotals.regular, 
+                night: monthTotals.night,
+                sunday: monthTotals.sunday, 
+                holiday: monthTotals.holiday,
+                nightSunday: monthTotals.nightSunday, 
+                nightHoliday: monthTotals.nightHoliday
+            }).reduce((a, b) => a + b, 0)}<br>
+            Total Horas Extra: ${Object.values({
+                extraRegular: monthTotals.extraRegular, 
+                extraNight: monthTotals.extraNight,
+                extraSunday: monthTotals.extraSunday, 
+                extraHoliday: monthTotals.extraHoliday,
+                extraNightSunday: monthTotals.extraNightSunday, 
+                extraNightHoliday: monthTotals.extraNightHoliday
+            }).reduce((a, b) => a + b, 0)}<br>
+            Total General: ${Object.values(monthTotals).reduce((a, b) => a + b, 0)}
+        </p>`;
+    document.getElementById('totals').innerHTML = totalsHTML;
 }
 
 // Agregar event listener al formulario

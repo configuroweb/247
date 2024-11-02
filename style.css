@@ -95,7 +95,7 @@ button:hover {
     background-color: var(--primary-hover);
 }
 
-/* Tabla principal */
+/* Estilos de la tabla */
 .table-container {
     overflow: auto;
     max-height: 70vh;
@@ -133,13 +133,38 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
+/* Estilos para tipos específicos de días */
+.rest-day {
+    background-color: #fff3e0 !important; /* Naranja muy claro para días de descanso */
+}
+
+.holiday-row {
+    background-color: #e8eaf6 !important; /* Azul muy claro para festivos */
+    color: #1a237e; /* Texto azul oscuro */
+    font-weight: 500;
+}
+
+.holiday-row td {
+    border-color: #c5cae9 !important; /* Borde azul claro */
+}
+
+.holiday-rest {
+    background: linear-gradient(45deg, #fff3e0 50%, #e8eaf6 50%) !important;
+    color: #1a237e;
+}
+
+.holiday-rest td {
+    border-color: #c5cae9 !important;
+}
+
+/* Para mantener el contraste en filas pares de festivos */
+tr:nth-child(even).holiday-row {
+    background-color: #e3f2fd !important; /* Un tono ligeramente diferente para filas pares */
+}
+
 .total-row {
     font-weight: bold;
     background-color: #e0e0e0 !important;
-}
-
-.rest-day {
-    background-color: #fff3e0 !important;
 }
 
 /* Sección de totales */
@@ -149,6 +174,18 @@ tr:nth-child(even) {
     background-color: var(--white);
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.totals h3 {
+    margin-top: 0;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 5px;
+}
+
+.totals p {
+    margin: 10px 0;
+    line-height: 1.8;
 }
 
 /* Diseño responsivo */
@@ -186,4 +223,65 @@ tr:nth-child(even) {
     th, td {
         padding: 6px;
     }
+
+    /* Mejorar la visualización en móviles */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .totals {
+        padding: 10px;
+    }
+}
+
+/* Ajustes para impresión */
+@media print {
+    body {
+        padding: 0;
+        background: white;
+    }
+
+    .container {
+        box-shadow: none;
+        max-width: 100%;
+    }
+
+    .cycle-info, form, button {
+        display: none;
+    }
+
+    table {
+        font-size: 8pt;
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    th {
+        background-color: #f4f4f4 !important;
+        color: black;
+        box-shadow: none;
+    }
+
+    .totals {
+        page-break-inside: avoid;
+        box-shadow: none;
+    }
+
+    .date-range {
+        display: block;
+        color: #666;
+        font-size: 0.9em;
+        margin-left: 20px;
+        margin-top: 2px;
+    }
+
+    .totals br {
+        line-height: 1.5;
+    }
+    
 }

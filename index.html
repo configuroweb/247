@@ -9,6 +9,7 @@
 <body>
     <div class="container">
         <h1>Validador Horas 24x7</h1>
+
         <div class="cycle-info">
             <h3>Información del Ciclo</h3>
             <ul>
@@ -17,11 +18,13 @@
                 <li>Ciclo completo: 48 horas de trabajo + 56 horas de descanso</li>
             </ul>
         </div>
+
         <form id="scheduleForm">
             <div class="form-group">
                 <label for="monthInput">Mes y Año:</label>
                 <input type="month" id="monthInput" required>
             </div>
+
             <div class="form-group">
                 <label for="startShift">Turno:</label>
                 <select id="startShift" required>
@@ -30,6 +33,7 @@
                     <option value="noche">Noche</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <label for="dayOfCycle">Día del Ciclo:</label>
                 <select id="dayOfCycle" required>
@@ -44,11 +48,14 @@
                     <option value="8">DD2 - Segundo día de descanso</option>
                 </select>
             </div>
+
             <button type="submit">Generar Horario</button>
         </form>
+
         <div id="schedule"></div>
         <div id="totals" class="totals"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

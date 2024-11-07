@@ -28,6 +28,7 @@
             <div class="form-group">
                 <label for="startShift">Turno:</label>
                 <select id="startShift" required>
+                    <option value="">Seleccione un turno</option>
                     <option value="tarde">Tarde</option>
                     <option value="manana">Mañana</option>
                     <option value="noche">Noche</option>
@@ -49,8 +50,41 @@
                 </select>
             </div>
 
-            <button type="submit">Generar Horario</button>
+            <div class="form-actions">
+                <button type="submit">Generar Horario</button>
+            </div>
         </form>
+
+        <!-- Modal de Vacaciones -->
+<!-- Modal de Vacaciones -->
+<div id="vacationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Configuración de Vacaciones</h3>
+            <span id="closeModal">&times;</span>
+        </div>
+        
+        <div class="modal-body">
+            <div id="vacationQuestion">
+                <p>¿Tiene vacaciones para reportar este mes?</p>
+                <div class="modal-buttons">
+                    <button type="button" id="yesVacation" class="btn-primary">Sí</button>
+                    <button type="button" id="noVacation" class="btn-secondary">No</button>
+                </div>
+            </div>
+
+            <div id="vacationSelector" class="hidden">
+                <p>Seleccione el rango de fechas de sus vacaciones:</p>
+                <div id="vacationCalendar"></div>
+                <div id="selectedDates">No hay fechas seleccionadas</div>
+                <div class="modal-buttons">
+                    <button type="button" id="confirmVacation" class="btn-primary">Confirmar</button>
+                    <button type="button" id="cancelVacation" class="btn-secondary">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
         <div id="schedule"></div>
         <div id="totals" class="totals"></div>

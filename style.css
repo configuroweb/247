@@ -5,6 +5,10 @@
     --text-color: #333;
     --border-color: #ddd;
     --white: #fff;
+    --modal-overlay: rgba(0, 0, 0, 0.5);
+    --vacation-bg: #e8f5e9;
+    --vacation-border: #a5d6a7;
+    --vacation-text: #2e7d32;
 }
 
 /* Estilos base */
@@ -81,21 +85,212 @@ input, select {
     width: 100%;
 }
 
+/* Botones */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
 button {
     padding: 8px 16px;
-    background-color: var(--primary-color);
-    color: var(--white);
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-top: 10px;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
-button:hover {
+button[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+button[type="submit"]:hover {
     background-color: var(--primary-hover);
 }
 
-/* Estilos de la tabla */
+#vacationBtn {
+    background-color: #2196F3;
+    color: var(--white);
+}
+
+#vacationBtn:hover {
+    background-color: #1976D2;
+}
+
+/* Modal y Calendario */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--modal-overlay);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: slideDown 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+#closeModal {
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s;
+    line-height: 1;
+}
+
+#closeModal:hover {
+    color: #333;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+/* Calendario de Vacaciones */
+#vacationCalendar {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.calendar th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.calendar td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #eee;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.calendar td:hover:not(:empty):not(.disabled) {
+    background-color: #f0f0f0;
+}
+
+.calendar td.selected {
+    background-color: var(--vacation-bg);
+    color: var(--vacation-text);
+    font-weight: bold;
+}
+
+.calendar td.selected::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid var(--vacation-border);
+    pointer-events: none;
+}
+
+.calendar td.in-range {
+    background-color: var(--vacation-bg);
+    color: var(--vacation-text);
+}
+
+.calendar td:empty {
+    background-color: #f9f9f9;
+    cursor: default;
+}
+
+#selectedDates {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Tabla principal de horarios */
 .table-container {
     overflow: auto;
     max-height: 70vh;
@@ -135,17 +330,17 @@ tr:nth-child(even) {
 
 /* Estilos para tipos específicos de días */
 .rest-day {
-    background-color: #fff3e0 !important; /* Naranja muy claro para días de descanso */
+    background-color: #fff3e0 !important;
 }
 
 .holiday-row {
-    background-color: #e8eaf6 !important; /* Azul muy claro para festivos */
-    color: #1a237e; /* Texto azul oscuro */
+    background-color: #e8eaf6 !important;
+    color: #1a237e;
     font-weight: 500;
 }
 
 .holiday-row td {
-    border-color: #c5cae9 !important; /* Borde azul claro */
+    border-color: #c5cae9 !important;
 }
 
 .holiday-rest {
@@ -157,14 +352,36 @@ tr:nth-child(even) {
     border-color: #c5cae9 !important;
 }
 
-/* Para mantener el contraste en filas pares de festivos */
 tr:nth-child(even).holiday-row {
-    background-color: #e3f2fd !important; /* Un tono ligeramente diferente para filas pares */
+    background-color: #e3f2fd !important;
 }
 
 .total-row {
     font-weight: bold;
     background-color: #e0e0e0 !important;
+}
+
+/* Estilos de vacaciones */
+.vacation-day {
+    background-color: var(--vacation-bg) !important;
+    color: var(--vacation-text);
+    font-style: italic;
+}
+
+.vacation-day td {
+    border-color: var(--vacation-border) !important;
+}
+
+.vacation-period {
+    padding: 10px;
+    background-color: var(--vacation-bg);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border: 1px solid var(--vacation-border);
+}
+
+.vacation-period strong {
+    color: var(--vacation-text);
 }
 
 /* Sección de totales */
@@ -188,6 +405,14 @@ tr:nth-child(even).holiday-row {
     line-height: 1.8;
 }
 
+.date-range {
+    display: block;
+    color: #666;
+    font-size: 0.9em;
+    margin-left: 20px;
+    margin-top: 2px;
+}
+
 /* Diseño responsivo */
 @media screen and (min-width: 768px) {
     .form-group {
@@ -199,6 +424,10 @@ tr:nth-child(even).holiday-row {
 
     .form-group:last-child {
         margin-right: 0;
+    }
+
+    .modal-content {
+        margin: 10% auto;
     }
 }
 
@@ -224,7 +453,6 @@ tr:nth-child(even).holiday-row {
         padding: 6px;
     }
 
-    /* Mejorar la visualización en móviles */
     .table-container {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -232,6 +460,28 @@ tr:nth-child(even).holiday-row {
 
     .totals {
         padding: 10px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+    .modal-buttons button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .calendar td {
+        padding: 8px;
     }
 }
 
@@ -272,16 +522,11 @@ tr:nth-child(even).holiday-row {
         box-shadow: none;
     }
 
-    .date-range {
-        display: block;
-        color: #666;
-        font-size: 0.9em;
-        margin-left: 20px;
-        margin-top: 2px;
+    .modal {
+        display: none !important;
     }
 
     .totals br {
         line-height: 1.5;
     }
-    
 }

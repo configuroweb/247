@@ -29,7 +29,6 @@ const holidays2024 = [
     new Date(2024, 9, 14), // Día de la Raza
     new Date(2024, 10, 4), // Todos los Santos
     new Date(2024, 10, 11), // Independencia de Cartagena
-    new Date(2024, 10, 14), // Independencia de la Raza
     new Date(2024, 11, 4),  // festivo 1 nov
     new Date(2024, 11, 11)  // festivo 2 nov
 ];

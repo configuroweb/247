@@ -540,16 +540,15 @@ function generateScheduleTable(formData) {
         extraNightSunday: {}, extraNightHoliday: {}
     };
 
-    let daysToSkip = 0;
-    if (dayOfCycle === 7) { 
-        daysToSkip = 2;
-    } else if (dayOfCycle === 8) { 
-        daysToSkip = 1;
-    }
-
-    if (daysToSkip > 0) {
-        currentDay = 6;
-    }
+    // Si empezamos en día de descanso, calculamos cuando empezará el próximo ciclo
+let daysToSkip = 0;
+if (dayOfCycle === 7) { // DD1
+    daysToSkip = 2; // Necesita saltar 2 días para llegar al día 1
+    currentDay = 6; // Empezaremos en el último día del ciclo anterior
+} else if (dayOfCycle === 8) { // DD2
+    daysToSkip = 1; // Necesita saltar 1 día para llegar al día 1
+    currentDay = 7; // Empezaremos en DD1
+}
 
     for (let i = 0; i < daysInMonth; i++) {
         const currentDate = new Date(year, month - 1, i + 1);

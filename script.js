@@ -18,6 +18,8 @@ const holidays2024 = [
     new Date(2024, 2, 25), // San José
     new Date(2024, 2, 28), // Jueves Santo
     new Date(2024, 2, 29), // Viernes Santo
+    new Date(2024, 3, 17), // Jueves Santo
+    new Date(2024, 3, 18), // Viernes Santo
     new Date(2024, 4, 1),  // Día del Trabajo
     new Date(2024, 4, 13), // Ascensión del Señor
     new Date(2024, 5, 3),  // Corpus Christi
